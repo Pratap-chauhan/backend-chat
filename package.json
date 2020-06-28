@@ -1,0 +1,20 @@
+{
+  "name": "popprobe-sockets",
+  "version": "1.0.0",
+  "description": "sokets",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "pratap",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "express": "^4.17.1",
+    "mongoose": "^4.11.11",
+    "mongoose-unique-validator": "^1.0.6",
+    "socket.io": "^2.3.0",
+    "socketio-auth": "^0.1.0",
+    "ws": "^7.2.3"
+  }
+}
