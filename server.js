@@ -18,6 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var numUsers = 0;
 const connectionInfo = [];
 allMessages = [];
+allUserInfo = [];
 io.on('connection', (socket) => {
   console.log("connected");
   var addedUser = false;
@@ -47,6 +48,7 @@ io.on('connection', (socket) => {
         }]
       }],
     };
+    allUserInfo.push(newUserInfo);
     const firstMessage = {
       from: {
         id: 0,
@@ -59,17 +61,13 @@ io.on('connection', (socket) => {
       message: `Welcome onboard!, Your id is ${socket.id}`
     }
     allMessages.push(firstMessage);
-    const sendUserInfo = { ...newUserInfo };
+    const sendUserInfo = { ...newUserInfo , allUserInfo };
     sendUserInfo.messages = [firstMessage];
     connectionInfo.push(newUserInfo);
     ++numUsers;
     addedUser = true;
     socket.emit('login', sendUserInfo);
-    socket.broadcast.emit('user joined', {
-      username: socket.username,
-      id: socket.id,
-      numUsers: numUsers
-    });
+    socket.broadcast.emit('user joined', newUserInfo);
   });
 
 
@@ -146,6 +144,7 @@ io.on('connection', (socket) => {
     const sendUserInfo = { ...filterData };
     const filterMessage = allMessages.filter((item) => (item.to.id == to) || (item.to.id == to && item.from.id == 0));
     sendUserInfo.messages = filterMessage;
+    sendUserInfo.allUserInfo = allUserInfo;
     socket.emit(`${from}`, {
       event: 'all data',
       data: sendUserInfo
@@ -193,6 +192,20 @@ io.on('connection', (socket) => {
       data: messages
     });
   })
+
+  socket.on('disconnect' , (data) =>{
+    console.log(data , "s" , socket);
+    const {id} = socket;
+    console.log(id);
+    const Userindex = allUserInfo.findIndex((item) => item.id === id);
+    allUserInfo.splice(Userindex , 1);
+    socket.broadcast.emit('userDisconnected' , {
+      event : 'userDisconnected',
+      data : {
+        id 
+      }
+    });
+  });
 
 
 });
